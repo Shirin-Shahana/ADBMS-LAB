@@ -1,0 +1,192 @@
+1.Create a database named Employee. Create a collection named empDetails 
+You can use any of the fields Name, Age ,e_mail, phone,salary
+
+> use Employee
+switched to db Employee
+> db.createCollection("empDetails")
+{ "ok" : 1 }
+
+
+Insert 5 documents in it using the different insert() methods and 
+
+> db.empDetails.insert({Name:"Mohan",Age:31,E_Mail:"mohan@gmail.com",Phone:9899543210,Salary:6000})
+WriteResult({ "nInserted" : 1 })
+
+> db.empDetails.insert({Name:"Raju",Age:25,E_Mail:"raju@gmail.com",Phone:9899543210,Salary:3000})
+WriteResult({ "nInserted" : 1 })
+
+> db.empDetails.insert({Name:"Bhuvan",Age:26,E_Mail:"bhuvan@gmail.com",Phone:9899543210,Salary:4500})
+WriteResult({ "nInserted" : 1 })
+
+> db.empDetails.insert({Name:"Bhilal",Age:60,E_Mail:"bhilal@gmail.com",Phone:9899543210,Salary:7500})
+WriteResult({ "nInserted" : 1 })
+
+> db.empDetails.insert({Name:"Shirin",Age:22,E_Mail:"shirin@gmail.com",Phone:9899453210,Salary:8000})
+WriteResult({ "nInserted" : 1 })
+>
+>
+
+1. Find the details of employee whose name is mohan
+
+> db.empDetails.findOne({Name:"Mohan"})
+{
+        "_id" : ObjectId("629b247dad9ef910823877e1"),
+        "Name" : "Mohan",
+        "Age" : 31,
+        "E_Mail" : "mohan@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 6000
+}
+>
+
+2. Fetch the documents of employees whose salary >=5000
+
+
+> db.empDetails.find({Salary:{$gte 5000}}).pretty()
+uncaught exception: SyntaxError: missing : after property id :
+@(shell):1:33
+> db.empDetails.find({Salary:{$gte:5000}}).pretty()
+{
+        "_id" : ObjectId("629b247dad9ef910823877e1"),
+        "Name" : "Mohan",
+        "Age" : 31,
+        "E_Mail" : "mohan@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 6000
+}
+{
+        "_id" : ObjectId("629b2507ad9ef910823877e4"),
+        "Name" : "Bhilal",
+        "Age" : 60,
+        "E_Mail" : "bhilal@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 7500
+}
+{
+        "_id" : ObjectId("629b2550ad9ef910823877e5"),
+        "Name" : "Shirin",
+        "Age" : 22,
+        "E_Mail" : "shirin@gmail.com",
+        "Phone" : 9899453210,
+        "Salary" : 8000
+}
+>
+
+c.Find the documents of employees whose name starts with letter r
+
+> db.empDetails.find({Name:/^R/}).pretty()
+{
+        "_id" : ObjectId("629b24b2ad9ef910823877e2"),
+        "Name" : "Raju",
+        "Age" : 25,
+        "E_Mail" : "raju@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 3000
+}
+>
+
+d. Find the documents of employees whose name is not in mohan , raju, bhuvan
+
+> db.empDetails.find({Name:{$nin:["Mohan","Raju","Bhuvan"]}}).pretty()
+{
+        "_id" : ObjectId("629b2507ad9ef910823877e4"),
+        "Name" : "Bhilal",
+        "Age" : 60,
+        "E_Mail" : "bhilal@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 7500
+}
+{
+        "_id" : ObjectId("629b2550ad9ef910823877e5"),
+        "Name" : "Shirin",
+        "Age" : 22,
+        "E_Mail" : "shirin@gmail.com",
+        "Phone" : 9899453210,
+        "Salary" : 8000
+}
+>
+
+
+e. Find the documents of employees whose names are mohan , raju, bhuvan
+
+> db.empDetails.find({Name:{$in:["Mohan","Raju","Bhuvan"]}}).pretty()
+{
+        "_id" : ObjectId("629b247dad9ef910823877e1"),
+        "Name" : "Mohan",
+        "Age" : 31,
+        "E_Mail" : "mohan@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 6000
+}
+{
+        "_id" : ObjectId("629b24b2ad9ef910823877e2"),
+        "Name" : "Raju",
+        "Age" : 25,
+        "E_Mail" : "raju@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 3000
+}
+{
+        "_id" : ObjectId("629b24dfad9ef910823877e3"),
+        "Name" : "Bhuvan",
+        "Age" : 26,
+        "E_Mail" : "bhuvan@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 4500
+}
+>
+
+f. Retrieve the details of employees whose age is less than 30. Display only the fields name, salary
+
+ > db.empDetails.find({Age:{$lt:30}},{Name:1,Salary:1}).pretty()
+{
+        "_id" : ObjectId("629b24b2ad9ef910823877e2"),
+        "Name" : "Raju",
+        "Salary" : 3000
+}
+{
+        "_id" : ObjectId("629b24dfad9ef910823877e3"),
+        "Name" : "Bhuvan",
+        "Salary" : 4500
+}
+{
+        "_id" : ObjectId("629b2550ad9ef910823877e5"),
+        "Name" : "Shirin",
+        "Salary" : 8000
+}
+>
+
+
+g. Find the details of employees whose salary is >5000 and age is < 30
+
+> db.empDetails.find({$and:[{Salary:{$gt:5000}},{Age:{$lt:30}}]}).pretty()
+{
+        "_id" : ObjectId("629b2550ad9ef910823877e5"),
+        "Name" : "Shirin",
+        "Age" : 22,
+        "E_Mail" : "shirin@gmail.com",
+        "Phone" : 9899453210,
+        "Salary" : 8000
+}
+>
+
+
+h. Update the e-mail of employee whose name is mohan  // findOneAndUpdate()
+
+> db.empDetails.findOneAndUpdate({Name:"Mohan"},{$set:{E_Mail:"mohannew@gmail.com"}})
+{
+        "_id" : ObjectId("629b247dad9ef910823877e1"),
+        "Name" : "Mohan",
+        "Age" : 31,
+        "E_Mail" : "mohannew@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 6000
+}
+>
+
+
+Delete all the documents of employees whose age>56
+
+> db.empDetails.remove({Age:{$gt:56}})
+WriteResult({ "nRemoved" : 1 })
+>

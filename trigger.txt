@@ -1,0 +1,513 @@
+Write a PL/SQL trigger to restrict the
+insert/update/delete operations on a table.
+
+
+SQL> create table sample(sid number,sname varchar(20));
+
+Table created.
+
+SQL> insert into sample values(1,'s01');
+
+1 row created.
+
+SQL> insert into sample values(2,'s02');
+
+1 row created.
+
+SQL> select * from sample;
+
+       SID SNAME
+---------- --------------------
+         1 s01
+         2 s02
+
+
+
+
+SQL> create or replace trigger t1 before insert or update or delete on sample for each row
+  2  begin
+  3  raise_application_error(-20000,'you are not permitted to do insert/update/delete');
+  4  end;
+  5  /
+
+Trigger created.
+
+SQL> insert into sample values(3,'s04');
+insert into sample values(3,'s04')
+            *
+ERROR at line 1:
+ORA-20000: you are not permitted to do insert/update/delete
+ORA-06512: at "SYSTEM.T1", line 2
+ORA-04088: error during execution of trigger 'SYSTEM.T1'
+
+
+
+
+2.Assume our DB has a relation schema :Pfessor (pNum,
+pName, salary) create a trigger to ensure that any
+new professor inserted has salary &gt;= 60000.
+
+
+
+SQL> create table professor(pnum number,pname varchar(20),salary number);
+
+Table created.
+
+SQL> insert into professor values(&pnum,'&pname',&salary);
+Enter value for pnum: 101
+Enter value for pname: abhiram
+Enter value for salary: 30000
+old   1: insert into professor values(&pnum,'&pname',&salary)
+new   1: insert into professor values(101,'abhiram',30000)
+
+1 row created.
+
+SQL> /
+Enter value for pnum: 102
+Enter value for pname: shirin
+Enter value for salary: 40000
+old   1: insert into professor values(&pnum,'&pname',&salary)
+new   1: insert into professor values(102,'shirin',40000)
+
+1 row created.
+
+
+
+
+SQL> create or replace trigger minsalary before insert on professor for each row
+  2  begin
+  3  if(:new.salary<60000)
+  4  then raise_Application_error(-20006,'violation of minimum professor salary');
+  5  end if;
+  6  end;
+  7  /
+
+Trigger created.
+
+SQL>  insert into professor values(&pnum,'&pname',&salary);
+Enter value for pnum: 202
+Enter value for pname: rahul
+Enter value for salary: 40000
+old   1:  insert into professor values(&pnum,'&pname',&salary)
+new   1:  insert into professor values(202,'rahul',40000)
+ insert into professor values(202,'rahul',40000)
+             *
+ERROR at line 1:
+ORA-20006: violation of minimum professor salary
+ORA-06512: at "SYSTEM.MINSALARY", line 3
+ORA-04088: error during execution of trigger 'SYSTEM.MINSALARY'
+
+
+
+
+3. Create a backlog table for professor to store deleted
+professor details. Manage the operation using trigger.
+
+
+SQL> create table professor_backlog as select * from professor;
+
+Table created.
+
+SQL> select * from professor_backlog;
+
+      PNUM PNAME                    SALARY
+---------- -------------------- ----------
+       101 abhiram                   30000
+       102 shirin                    40000
+       203 gopi                      70000
+
+SQL> delete from professor_backlog;
+
+3 rows deleted.
+
+
+SQL> create or replace trigger t2 after delete on professor for each row
+  2  begin
+  3  insert into professor values(:old.pnum,:old.pname,:old.salary);
+  4  end;
+  5  /
+
+Trigger created.
+
+SQL> select * from professor;
+
+      PNUM PNAME                    SALARY
+---------- -------------------- ----------
+       101 abhiram                   30000
+       102 shirin                    40000
+       203 gopi                      70000
+
+SQL> delete from professor where pnum=203;
+delete from professor where pnum=203
+            *
+ERROR at line 1:
+ORA-04091: table SYSTEM.PROFESSOR is mutating, trigger/function may not see it
+ORA-06512: at "SYSTEM.T2", line 2
+ORA-04088: error during execution of trigger 'SYSTEM.T2'
+
+
+
+create or replace trigger t1 before insert or update or delete on sample for each row
+begin
+raise_application_error(-20000,'you are not permitted to do insert/update/delete');
+end;
+/
+
+create or replace trigger t1 after insert or update or delete on sample for each row
+begin
+raise_application_error(-20000,'you are successfully permitted to do insert/update/delete');
+end;
+/
+
+
+create or replace trigger minsalary before insert on professor for each row
+begin
+if(:new.salary<60000)
+then raise_Application_error(-20006,'violation of minimum professor salary');
+end if;
+end;
+/
+
+
+create or replace trigger t2 after delete on professor for each row
+begin
+insert into professor_backlog values(:old.pnum,:old.pname,:old.salary);
+end;
+/
+
+
+create or replace trigger t3 after insert or delete on student for each row
+begin
+if(:new.gender='f')
+then
+	update counts set female=female+1;
+else
+	update counts set male=male+1;
+end if;
+end;
+/    
+Maintain a Gold Price History table using trigger.
+
+
+
+
+
+
+create table gold(g_date date,price number)
+
+create or replace trigger t4 after insert on gold for each row
+begin
+
+
+
+
+
+
+
+create or replace trigger t5 after update on gold for each row
+begin
+insert into g_backlog values(:old.g_date,:old.price);
+end;
+/
+
+
+
+
+
+
+
+copy
+
+
+
+
+SQL> drop trigger t1;
+
+Trigger dropped.
+
+SQL> insert into sample values(5,'s05');
+
+1 row created.
+
+
+SQL> select * from sample;
+
+       SID SNAME
+---------- --------------------
+         1 s01
+         2 s02
+         5 s05
+
+
+
+
+
+SQL> insert into professor values(&pnum,'&pname',&salary);
+Enter value for pnum: 203
+Enter value for pname: gopi
+Enter value for salary: 70000
+old   1: insert into professor values(&pnum,'&pname',&salary)
+new   1: insert into professor values(203,'gopi',70000)
+
+1 row created.
+
+
+
+SQL> 
+SQL> create or replace trigger t2 after delete on professor for each row
+  2  begin
+  3  insert into professor_backlog values(:old.pnum,:old.pname,:old.salary);
+  4  end;
+  5  /
+
+Trigger created.
+
+SQL> delete from professor where pnum=203;
+
+1 row deleted.
+
+SQL> select * from professor'
+  2  ;
+ERROR:
+ORA-01756: quoted string not properly terminated
+
+
+SQL> select * from professor;
+
+      PNUM PNAME                    SALARY
+---------- -------------------- ----------
+       101 abhiram                   30000
+       102 shirin                    40000
+
+SQL> select * from professor_backlog;
+
+      PNUM PNAME                    SALARY
+---------- -------------------- ----------
+       203 gopi                      70000
+
+SQL> create table student(rollno number,name varchar(20),gender varchar(10));
+
+Table created.
+
+SQL> create table counts(male number,female number);
+
+Table created.
+
+SQL> insert into counts values(0,0);
+
+1 row created.
+
+SQL> create or replace trigger t3 after insert or delete on student for each row
+  2  begin
+  3  if(:new.gender='f')
+  4  then
+  5   update counts set female=female+1;
+  6  else
+  7   update counts set male=male+1;
+  8  end if;
+  9  end;
+ 10  /
+
+Trigger created.
+
+SQL> insert into student values(101,'shirin',f);
+insert into student values(101,'shirin',f)
+                                        *
+ERROR at line 1:
+ORA-00984: column not allowed here
+
+
+SQL>  insert into student values(101,'shirin','f');
+
+1 row created.
+
+SQL> select * from student;
+
+    ROLLNO NAME                 GENDER
+---------- -------------------- ----------
+       101 shirin               f
+
+SQL> select * from counts;
+
+      MALE     FEMALE
+---------- ----------
+         0          1
+
+SQL> create or replace trigger t3 after insert or delete on student for each row
+  2  begin
+  3  if(:new.gender='f')
+  4  then
+  5   update counts set female=female+1;
+  6  else
+  7   update counts set male=male+1;
+  8  end if;
+  9  if(:old.gender='f')
+ 10  then
+ 11   update counts set female=female-1;
+ 12  else
+ 13   update counts set male=male-1;
+ 14  end if;
+ 15  end;
+ 16  /
+
+Trigger created.
+
+SQL> select * from counts;
+
+      MALE     FEMALE
+---------- ----------
+         0          1
+
+SQL> insert into student values(102,'jerin','m');
+
+1 row created.
+
+SQL> select * from counts;
+
+      MALE     FEMALE
+---------- ----------
+         0          1
+
+SQL> select * from student;
+
+    ROLLNO NAME                 GENDER
+---------- -------------------- ----------
+       101 shirin               f
+       102 jerin                m
+
+SQL> insert into student values(103,'megha','f');
+
+1 row created.
+
+SQL> select * from student;
+
+    ROLLNO NAME                 GENDER
+---------- -------------------- ----------
+       101 shirin               f
+       102 jerin                m
+       103 megha                f
+
+SQL> select * from counts;
+
+      MALE     FEMALE
+---------- ----------
+        -1          2
+
+SQL> create or replace trigger t3 after insert or delete on student for each row
+  2  begin
+  3  if(:new.gender='f')
+  4  then
+  5   update counts set female=female+1;
+  6  else
+  7   update counts set male=male+1;
+  8  end if;
+  9  end;
+ 10  /
+
+Trigger created.
+
+SQL> delete from counts;
+
+1 row deleted.
+
+SQL> insert into counts values(1,2);
+
+1 row created.
+
+SQL> create table gold(g_date date,price number);
+
+Table created.
+
+SQL> create table g_backlog(g_date date,price number);
+
+Table created.
+
+SQL> insert into g_backlog values('19-mar-2020',20000);
+
+1 row created.
+
+SQL> delete from g_backlog;
+
+1 row deleted.
+
+SQL> create or replace trigger t5 after update on gold for each row
+  2  begin
+  3  insert into g_backlog values(:old.g_date,:old.price);
+  4  end;
+  5  /
+
+Trigger created.
+
+SQL> drop table gold;
+
+Table dropped.
+
+SQL> create table gold(g_date date default sysdate,price number);
+
+Table created.
+
+SQL> insert into gold values (sysdate,40000);
+
+1 row created.
+
+SQL> select * from gold;
+
+G_DATE         PRICE
+--------- ----------
+24-MAY-22      40000
+
+SQL> delete from gold;
+
+1 row deleted.
+
+SQL> select * from g_backlog;
+
+no rows selected
+
+SQL> insert into gold values (sysdate,40000);
+
+1 row created.
+
+SQL> update gold set price=50000;
+
+1 row updated.
+
+SQL> select * from gold;
+
+G_DATE         PRICE
+--------- ----------
+24-MAY-22      50000
+
+SQL> select * from g_backlog;
+
+no rows selected
+
+SQL> create or replace trigger t5 after update on gold for each row
+  2  begin
+  3  insert into g_backlog values(:old.g_date,:old.price);
+  4  end;
+  5  /
+
+Trigger created.
+
+SQL> update gold set price=5000;
+
+1 row updated.
+
+SQL> select * from g_backlog;
+
+G_DATE         PRICE
+--------- ----------
+24-MAY-22      50000
+
+SQL> update gold set price=34000;
+
+1 row updated.
+
+SQL> select * from g_backlog;
+
+G_DATE         PRICE
+--------- ----------
+24-MAY-22      50000
+24-MAY-22       5000
+

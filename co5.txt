@@ -1,0 +1,220 @@
+
+         co5
+
+
+1.In database Employee.
+
+
+ db.empDetails.update({Name:"Bhuvan"},{$set:{dept:"Developer"}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.empDetails.update({Name:"Mohan"},{$set:{dept:"Designer"}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.empDetails.update({Name:"Shirin"},{$set:{dept:"Designer"}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.empDetails.update({Name:"Raju"},{$set:{dept:"Tester"}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.empDetails.insert({Name:"Bhilal",Age:60,E_Mail:"bhilal@gmail.com",Phone:9899543210,Salary:7500})
+WriteResult({ "nInserted" : 1 })
+> db.empDetails.update({Name:"Bhilal"},{$set:{dept:"Tester"}})
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+> db.empDetails.find().pretty()
+{
+        "_id" : ObjectId("629b247dad9ef910823877e1"),
+        "Name" : "Mohan",
+        "Age" : 31,
+        "E_Mail" : "mohannew@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 6000,
+        "dept" : "Designer"
+}
+{
+        "_id" : ObjectId("629b24b2ad9ef910823877e2"),
+        "Name" : "Raju",
+        "Age" : 25,
+        "E_Mail" : "raju@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 3000,
+        "dept" : "Tester"
+}
+{
+        "_id" : ObjectId("629b24dfad9ef910823877e3"),
+        "Name" : "Bhuvan",
+        "Age" : 26,
+        "E_Mail" : "bhuvan@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 4500,
+        "dept" : "Developer"
+}
+{
+        "_id" : ObjectId("629b2550ad9ef910823877e5"),
+        "Name" : "Shirin",
+        "Age" : 22,
+        "E_Mail" : "shirin@gmail.com",
+        "Phone" : 9899453210,
+        "Salary" : 8000,
+        "dept" : "Designer"
+}
+{
+        "_id" : ObjectId("629ebf04a33d1c844c19e99c"),
+        "Name" : "Bhilal",
+        "Age" : 60,
+        "E_Mail" : "bhilal@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 7500,
+        "dept" : "Tester"
+}
+
+
+find the average salary of each dept.
+
+db.empDetails.aggregate([{$group:{_id:"$dept","Avg_Salary":{$avg:"$Salary"}}}])
+{ "_id" : "Tester", "Avg_Salary" : 5250 }
+{ "_id" : "Designer", "Avg_Salary" : 7000 }
+{ "_id" : "Developer", "Avg_Salary" : 4500 }
+>
+
+
+find the minimum salary of each dept.
+
+> db.empDetails.aggregate([{$group:{_id:"$dept","Min_Salary":{$min:"$Salary"}}}])
+{ "_id" : "Designer", "Min_Salary" : 6000 }
+{ "_id" : "Tester", "Min_Salary" : 3000 }
+{ "_id" : "Developer", "Min_Salary" : 4500 }
+>
+
+find the maximum salary of each dept.
+
+> db.empDetails.aggregate([{$group:{_id:"$dept","Max_Salary":{$max:"$Salary"}}}])
+{ "_id" : "Tester", "Max_Salary" : 7500 }
+{ "_id" : "Designer", "Max_Salary" : 8000 }
+{ "_id" : "Developer", "Max_Salary" : 4500 }
+>
+
+
+find the no.of employees of each dept.
+
+> db.empDetails.aggregate([{$group:{_id:"$dept","No of Employees":{$sum:1}}}])
+{ "_id" : "Tester", "No of Employees" : 2 }
+{ "_id" : "Designer", "No of Employees" : 2 }
+{ "_id" : "Developer", "No of Employees" : 1 }
+>
+
+
+sort the collection empDetails in descending order of name
+
+> db.empDetails.find().sort({name:-1}).pretty()
+{
+        "_id" : ObjectId("629b247dad9ef910823877e1"),
+        "Name" : "Mohan",
+        "Age" : 31,
+        "E_Mail" : "mohannew@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 6000,
+        "dept" : "Designer"
+}
+{
+        "_id" : ObjectId("629b24b2ad9ef910823877e2"),
+        "Name" : "Raju",
+        "Age" : 25,
+        "E_Mail" : "raju@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 3000,
+        "dept" : "Tester"
+}
+{
+        "_id" : ObjectId("629b24dfad9ef910823877e3"),
+        "Name" : "Bhuvan",
+        "Age" : 26,
+        "E_Mail" : "bhuvan@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 4500,
+        "dept" : "Developer"
+}
+{
+        "_id" : ObjectId("629b2550ad9ef910823877e5"),
+        "Name" : "Shirin",
+        "Age" : 22,
+        "E_Mail" : "shirin@gmail.com",
+        "Phone" : 9899453210,
+        "Salary" : 8000,
+        "dept" : "Designer"
+}
+{
+        "_id" : ObjectId("629ebf04a33d1c844c19e99c"),
+        "Name" : "Bhilal",
+        "Age" : 60,
+        "E_Mail" : "bhilal@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 7500,
+        "dept" : "Tester"
+}
+>
+
+
+Create a text index for ‘name’ and search for names mohan and bhuvan
+
+> db.empDetails.createIndex({Name:"text"})
+{
+        "numIndexesBefore" : 1,
+        "numIndexesAfter" : 2,
+        "createdCollectionAutomatically" : false,
+        "ok" : 1
+}
+
+> db.empDetails.find({$text:{$search:"Mohan Bhuvan"}}).pretty()
+{
+        "_id" : ObjectId("629b24dfad9ef910823877e3"),
+        "Name" : "Bhuvan",
+        "Age" : 26,
+        "E_Mail" : "bhuvan@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 4500,
+        "dept" : "Developer"
+}
+{
+        "_id" : ObjectId("629b247dad9ef910823877e1"),
+        "Name" : "Mohan",
+        "Age" : 31,
+        "E_Mail" : "mohannew@gmail.com",
+        "Phone" : 9899543210,
+        "Salary" : 6000,
+        "dept" : "Designer"
+}
+>
+
+2.create a database Inventory and create an orders collection. Apply MapReduce operation for finding the total purchase of each customer.
+
+
+ use inventory
+switched to db inventory
+> db.createCollection("order")
+{ "ok" : 1 }
+> db.order.insert({Cust_Id:200,Name:"Maya",Item:"Rice",Price:340})
+WriteResult({ "nInserted" : 1 })
+> db.order.insert({Cust_Id:201,Name:"Manu",Item:"Rice",Price:340})
+WriteResult({ "nInserted" : 1 })
+> db.order.insert({Cust_Id:202,Name:"Midhun",Item:"Sugar",Price:150})
+WriteResult({ "nInserted" : 1 })
+> db.order.insert({Cust_Id:202,Name:"Midhun",Item:"Wheat",Price:350})
+WriteResult({ "nInserted" : 1 })
+> db.order.insert({Cust_Id:200,Name:"Maya",Item:"Wheat",Price:350})
+WriteResult({ "nInserted" : 1 })
+
+
+
+
+> var mapFunction=function(){emit(this.Cust_Id,this.Price);};
+> var reduceFunction=function(key,values){return Array.sum(values);};
+> db.order.mapReduce(mapFunction,reduceFunction,{'out':"map_example"})
+{ "result" : "map_example", "ok" : 1 }
+> db.map_example.find()
+{ "_id" : 200, "value" : 690 }
+{ "_id" : 201, "value" : 340 }
+{ "_id" : 202, "value" : 500 }
+>
+
+ var mapFunction=function(){emit(this.Cust_Id,this.Price);};
+> db.order.mapReduce(mapFunction,reduceFunction,{query:{Cust_Id:{$gt:201}},out:"map_example"})
+
+
+
